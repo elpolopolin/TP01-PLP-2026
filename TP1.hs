@@ -76,6 +76,7 @@ foldCircuito :: (Caja -> a) -> (a -> a -> a) -> (Caja -> a -> a -> Caja -> a) ->
 foldCircuito fCaja fSerie fParalelo circuito = recCircuito (fCaja) (\res1 c1 res2 c2 -> fSerie res1 res2) (\ca1 res1 c1 res2 c2 ca2 -> fParalelo ca1 res1 res2 ca2) (circuito)
 
 
+
 -- 3 invertido
 
 --invertido = undefined -- TODO: COMPLETAR
@@ -84,11 +85,13 @@ invertido = foldCircuito (Caja) (\ x y -> Serie y x) (\ca1 a b ca2 -> Paralelo c
 
 -- 4: hayCaminoIluminado
 
-hayCaminoIluminado = undefined -- TODO: COMPLETAR
-
+hayCaminoIluminado :: Circuito -> Bool
+hayCaminoIluminado = foldCircuito (\ x -> if x == on then True else False) (\ c1 c2 -> c1 && c2) (\ caja1 circuito1 circuito2 caja2 -> caja1 == on && (circuito1 || circuito2) && caja2 == on)
+--c1 = caja1 c2=caja2
 -- 5: cantidadPrendidas
 
-cantidadPrendidas = undefined -- TODO: COMPLETAR
+cantidadPrendidas :: Circuito -> Int
+cantidadPrendidas = foldCircuito (\caja-> if caja == on then 1 else 0) (\circuito1 circuito2 -> circuito1 + circuito2) (\ caja1 circ1 circ2 caja2 -> (\caja1-> if caja1 == on then 1 else 0) + circ1 + circ2 + (\caja2-> if caja2 == on then 1 else 0) ) --foldr
 
 -- 6: cajasDeCircuito
 
