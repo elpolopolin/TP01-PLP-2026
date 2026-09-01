@@ -94,8 +94,8 @@ cantidadPrendidas :: Circuito -> Int
 cantidadPrendidas = foldCircuito (\caja-> if caja == on then 1 else 0) (\circuito1 circuito2 -> circuito1 + circuito2) (\ caja1 circ1 circ2 caja2 -> (\caja1-> if caja1 == on then 1 else 0) + circ1 + circ2 + (\caja2-> if caja2 == on then 1 else 0) ) --foldr
 
 -- 6: cajasDeCircuito
-
-cajasDeCircuito = undefined -- TODO: COMPLETAR
+cajasDeCircuito :: Circuito -> [Caja]
+cajasDeCircuito = foldCircuito (\caja -> caja : []) (\ circuito1 circuito2 -> circuito1 ++ circuito2) (\caja1 circuito1 circuito2 caja2 ->  (caja1 :[]) ++ circuito1 ++ circuito2 ++ (caja2 : [])) 
 
 -- 7: esCircuitoProlijo
 
