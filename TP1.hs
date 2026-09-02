@@ -91,15 +91,16 @@ hayCaminoIluminado = foldCircuito (\ x -> if x == on then True else False) (\ c1
 -- 5: cantidadPrendidas
 
 cantidadPrendidas :: Circuito -> Int
-cantidadPrendidas = foldCircuito (\caja-> if caja == on then 1 else 0) (\circuito1 circuito2 -> circuito1 + circuito2) (\ caja1 circ1 circ2 caja2 -> (\caja1-> if caja1 == on then 1 else 0) + circ1 + circ2 + (\caja2-> if caja2 == on then 1 else 0) ) --foldr
+cantidadPrendidas = foldCircuito (\caja-> if caja == on then 1 else 0) (\circuito1 circuito2 -> circuito1 + circuito2) ((\ caja1 circ1 circ2 caja2 -> (if caja1 == on then 1 else 0) + circ1 + circ2 + (if caja2 == on then 1 else 0))) --foldr
 
 -- 6: cajasDeCircuito
 cajasDeCircuito :: Circuito -> [Caja]
 cajasDeCircuito = foldCircuito (\caja -> caja : []) (\ circuito1 circuito2 -> circuito1 ++ circuito2) (\caja1 circuito1 circuito2 caja2 ->  (caja1 :[]) ++ circuito1 ++ circuito2 ++ (caja2 : [])) 
 
 -- 7: esCircuitoProlijo
+esCircuitoProlijo :: Circuito -> Bool
+esCircuitoProlijo circuito = recCircuito (\x -> True) (\ resultado1 circuito1 resultado2 circuito2 -> resultado1 && resultado2 && (case circuito2 of Serie _ _ -> False; _         -> True)) (\_ resultado1 _ resultado2 _ _ -> resultado1 && resultado2) circuito
 
-esCircuitoProlijo = undefined -- TODO: COMPLETAR
 
 -- 8: circuitoEmprolijado
 
