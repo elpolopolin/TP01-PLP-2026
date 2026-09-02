@@ -86,7 +86,7 @@ invertido = foldCircuito (Caja) (\ x y -> Serie y x) (\ca1 a b ca2 -> Paralelo c
 -- 4: hayCaminoIluminado
 
 hayCaminoIluminado :: Circuito -> Bool
-hayCaminoIluminado = foldCircuito (\ x -> if x == on then True else False) (\ c1 c2 -> c1 && c2) (\ caja1 circuito1 circuito2 caja2 -> caja1 == on && (circuito1 || circuito2) && caja2 == on)
+hayCaminoIluminado = foldCircuito (\ caja -> if caja == on then True else False) (\ circuito1 circuito2 -> circuito1 && circuito2) (\ caja1 circuito1 circuito2 caja2 -> caja1 == on && (circuito1 || circuito2) && caja2 == on)
 --c1 = caja1 c2=caja2
 -- 5: cantidadPrendidas
 
@@ -107,8 +107,11 @@ esCircuitoProlijo circuito = recCircuito (\x -> True) (\ resultado1 circuito1 re
 circuitoEmprolijado = undefined -- TODO: COMPLETAR
 
 -- 9: tienenLaMismaEstructura 
-
-tienenLaMismaEstructura = undefined -- TODO: COMPLETAR
+tienenLaMismaEstructura :: Circuito -> Circuito -> Bool
+tienenLaMismaEstructura (Caja _) (Caja _ ) = True
+tienenLaMismaEstructura (Serie circuito1 circuito2) (Serie circuito3 circuito4) = tienenLaMismaEstructura circuito1  circuito3 && tienenLaMismaEstructura circuito2 circuito4
+tienenLaMismaEstructura (Paralelo _ circuito1 circuito2 _) (Paralelo _ circuito3 circuito4 _) = tienenLaMismaEstructura circuito1 circuito3 && tienenLaMismaEstructura circuito2 circuito4
+tienenLaMismaEstructura _ _ = False
 
 -- 10: subCircuitoMásResistente
 
