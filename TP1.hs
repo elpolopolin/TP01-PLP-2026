@@ -100,21 +100,22 @@ invertido = foldCircuito (Caja) (\x y -> Serie y x) (\ca1 a b ca2 -> Paralelo ca
 -- 4: hayCaminoIluminado
 
 hayCaminoIluminado :: Circuito -> Bool
-hayCaminoIluminado = foldCircuito (\caja -> if caja == on then True else False) (\circuito1 circuito2 -> circuito1 && circuito2) (\caja1 circuito1 circuito2 caja2 -> caja1 == on && (circuito1 || circuito2) && caja2 == on)
-
+hayCaminoIluminado = foldCircuito (== on) ( &&) (\caja1 circuito1 circuito2 caja2 -> caja1 == on && (circuito1 || circuito2) && caja2 == on)
+-- beta reduccion (\caja -> if caja == on then True else False) -> (== on)
 -- c1 = caja1 c2=caja2
 -- 5: cantidadPrendidas
 
 cantidadPrendidas :: Circuito -> Int
-cantidadPrendidas = foldCircuito (\caja -> if caja == on then 1 else 0) (\circuito1 circuito2 -> circuito1 + circuito2) ((\caja1 circ1 circ2 caja2 -> (if caja1 == on then 1 else 0) + circ1 + circ2 + (if caja2 == on then 1 else 0))) -- foldr
+cantidadPrendidas = foldCircuito (\caja -> if caja == on then 1 else 0) (+) ((\caja1 circ1 circ2 caja2 -> (if caja1 == on then 1 else 0) + circ1 + circ2 + (if caja2 == on then 1 else 0))) -- foldr
+
 
 -- 6: cajasDeCircuito
 cajasDeCircuito :: Circuito -> [Caja]
-cajasDeCircuito = foldCircuito (\caja -> caja : []) (\circuito1 circuito2 -> circuito1 ++ circuito2) (\caja1 circuito1 circuito2 caja2 -> (caja1 : []) ++ circuito1 ++ circuito2 ++ (caja2 : []))
+cajasDeCircuito = foldCircuito (\caja -> caja : []) (++) (\caja1 circuito1 circuito2 caja2 -> (caja1 : []) ++ circuito1 ++ circuito2 ++ (caja2 : []))
 
 -- 7 :
 esCircuitoProlijo :: Circuito -> Bool
-esCircuitoProlijo = recCircuito (\x -> True) (\res1 c1 res2 c2 -> res1 && res2 && (case c2 of Serie _ _ -> False; _ -> True)) (\caja1 res1 c1 res2 c2 caja2 -> res1 && res2)
+esCircuitoProlijo = recCircuito (const True) (\res1 c1 res2 c2 -> res1 && res2 && (case c2 of Serie _ _ -> False; _ -> True)) (\caja1 res1 c1 res2 c2 caja2 -> res1 && res2)
 
 -- 9:
 
@@ -149,13 +150,18 @@ tienenLaMismaEstructura c1 c2 =
 -- resistenciaCircuito :: Circuito -> Float
 
 subCircuitoMasResistente :: Circuito -> Circuito
-subCircuitoMasResistente = recCircuito (\x -> Caja x) (\rec1 c1 rec2 c2 -> mejor (Serie c1 c2) ((mejor rec1 rec2))) (\caja1 rec1 c1 rec2 c2 caja2 -> mejor (mejor rec1 rec2) (Paralelo caja1 c1 c2 caja2))
+subCircuitoMasResistente = recCircuito (Caja) (\rec1 c1 rec2 c2 -> mejor (Serie c1 c2) ((mejor rec1 rec2))) (\caja1 rec1 c1 rec2 c2 caja2 -> mejor (mejor rec1 rec2) (Paralelo caja1 c1 c2 caja2))
   where
     mejor a b =
       if resistenciaCircuito a >= resistenciaCircuito b
         then a
         else b
+{-- se puede plantear como un foldr la decision del mejor subcircuito
+subcircuitoMasResistente = recCircuito (caja) (/)
 
+where 
+  mejor foldr (Caja) ()
+--}
 {-- 11: Demostrar: alternado . alternado = id
 
 alternado :: Circuito -> Circuito
